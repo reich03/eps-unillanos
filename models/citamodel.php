@@ -36,6 +36,8 @@ class CitaModel extends Model
     ";
         return $this->db->connect()->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    
     public function getById($id)
     {
         try {

@@ -102,7 +102,7 @@
         <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-semibold text-gray-900">Listado de Citas</h3>
         </div>
-        
+
         <?php if (empty($this->d)): ?>
             <div class="text-center py-12">
                 <div class="text-gray-400 text-6xl mb-4">📅</div>
@@ -130,8 +130,8 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         <?php foreach ($this->d as $index => $cita): ?>
-                            <tr class="hover:bg-gray-50 transition-colors duration-200 cita-row" 
-                                data-paciente="<?= htmlspecialchars($cita['id_pac']) ?>" 
+                            <tr class="hover:bg-gray-50 transition-colors duration-200 cita-row"
+                                data-paciente="<?= htmlspecialchars($cita['id_pac']) ?>"
                                 data-estado="<?= htmlspecialchars($cita['est_cita']) ?>">
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
@@ -145,12 +145,14 @@
                                         </div>
                                         <div>
                                             <div class="text-sm font-medium text-gray-900">Paciente ID: <?= $cita['id_pac'] ?></div>
+                                            <div class="text-sm font-medium text-gray-900">Nombre: <?= $cita['nombre_paciente'] ?></div>
                                             <div class="text-sm text-gray-500">Información del paciente</div>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm text-gray-900">Horario ID: <?= $cita['id_horario'] ?></div>
+                                    <div class="text-sm text-gray-900">Horario y doctor: <?= $cita['detalle_horario'] ?></div>
                                     <div class="text-sm text-gray-500">Ver detalles de horario</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
@@ -191,15 +193,15 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-center">
                                     <div class="flex items-center justify-center space-x-2">
-                                        <a href="/cita/edit/<?= $cita['id_cita'] ?>" 
-                                           class="inline-flex items-center px-3 py-1.5 bg-eps-blue-100 text-eps-blue-700 text-sm font-medium rounded-lg hover:bg-eps-blue-200 transition-colors duration-200"
-                                           title="Editar cita">
+                                        <a href="/cita/edit/<?= $cita['id_cita'] ?>"
+                                            class="inline-flex items-center px-3 py-1.5 bg-eps-blue-100 text-eps-blue-700 text-sm font-medium rounded-lg hover:bg-eps-blue-200 transition-colors duration-200"
+                                            title="Editar cita">
                                             <span class="mr-1">✏️</span>
                                             Editar
                                         </a>
-                                        <button onclick="confirmDelete(<?= $cita['id_cita'] ?>)" 
-                                                class="inline-flex items-center px-3 py-1.5 bg-red-100 text-red-700 text-sm font-medium rounded-lg hover:bg-red-200 transition-colors duration-200"
-                                                title="Eliminar cita">
+                                        <button onclick="confirmDelete(<?= $cita['id_cita'] ?>)"
+                                            class="inline-flex items-center px-3 py-1.5 bg-red-100 text-red-700 text-sm font-medium rounded-lg hover:bg-red-200 transition-colors duration-200"
+                                            title="Eliminar cita">
                                             <span class="mr-1">🗑️</span>
                                             Eliminar
                                         </button>
@@ -223,67 +225,67 @@
 </div>
 
 <script>
-function confirmDelete(citaId) {
-    if (confirm('¿Estás seguro de que deseas eliminar esta cita? Esta acción no se puede deshacer.')) {
-        window.location.href = '/cita/delete/' + citaId;
-    }
-}
-
-function refreshTable() {
-    window.location.reload();
-}
-
-function clearFilters() {
-    document.getElementById('searchPatient').value = '';
-    document.getElementById('filterStatus').value = '';
-    document.getElementById('filterDate').value = '';
-    filterTable();
-}
-
-function filterTable() {
-    const searchTerm = document.getElementById('searchPatient').value.toLowerCase();
-    const statusFilter = document.getElementById('filterStatus').value;
-    const dateFilter = document.getElementById('filterDate').value;
-    
-    const rows = document.querySelectorAll('.cita-row');
-    let visibleCount = 0;
-    
-    rows.forEach(row => {
-        let show = true;
-                if (searchTerm && !row.dataset.paciente.toLowerCase().includes(searchTerm)) {
-            show = false;
+    function confirmDelete(citaId) {
+        if (confirm('¿Estás seguro de que deseas eliminar esta cita? Esta acción no se puede deshacer.')) {
+            window.location.href = '/cita/delete/' + citaId;
         }
-        
-        if (statusFilter && row.dataset.estado !== statusFilter) {
-            show = false;
-        }
-        
-        row.style.display = show ? '' : 'none';
-        if (show) visibleCount++;
-    });
-    
-    const counter = document.querySelector('.text-sm.text-gray-700 span');
-    if (counter) {
-        counter.textContent = visibleCount;
     }
-}
 
-document.getElementById('searchPatient').addEventListener('input', filterTable);
-document.getElementById('filterStatus').addEventListener('change', filterTable);
-document.getElementById('filterDate').addEventListener('change', filterTable);
+    function refreshTable() {
+        window.location.reload();
+    }
 
-document.addEventListener('DOMContentLoaded', function() {
-    const cards = document.querySelectorAll('.shadow-lg');
-    cards.forEach((card, index) => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
-        setTimeout(() => {
-            card.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
-            card.style.opacity = '1';
-            card.style.transform = 'translateY(0)';
-        }, index * 100);
+    function clearFilters() {
+        document.getElementById('searchPatient').value = '';
+        document.getElementById('filterStatus').value = '';
+        document.getElementById('filterDate').value = '';
+        filterTable();
+    }
+
+    function filterTable() {
+        const searchTerm = document.getElementById('searchPatient').value.toLowerCase();
+        const statusFilter = document.getElementById('filterStatus').value;
+        const dateFilter = document.getElementById('filterDate').value;
+
+        const rows = document.querySelectorAll('.cita-row');
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            let show = true;
+            if (searchTerm && !row.dataset.paciente.toLowerCase().includes(searchTerm)) {
+                show = false;
+            }
+
+            if (statusFilter && row.dataset.estado !== statusFilter) {
+                show = false;
+            }
+
+            row.style.display = show ? '' : 'none';
+            if (show) visibleCount++;
+        });
+
+        const counter = document.querySelector('.text-sm.text-gray-700 span');
+        if (counter) {
+            counter.textContent = visibleCount;
+        }
+    }
+
+    document.getElementById('searchPatient').addEventListener('input', filterTable);
+    document.getElementById('filterStatus').addEventListener('change', filterTable);
+    document.getElementById('filterDate').addEventListener('change', filterTable);
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.shadow-lg');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
     });
-});
 </script>
 
 <?php require_once 'views/components/footer.php'; ?>

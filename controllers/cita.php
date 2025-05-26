@@ -15,7 +15,7 @@ class Cita extends Controller
 
     function render()
     {
-        $citas = $this->model->getAll();
+        $citas = $this->model->getAllWithDetails();
         $this->view->render('cita/index', $citas);
     }
 
