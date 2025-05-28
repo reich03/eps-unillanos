@@ -472,13 +472,13 @@
     };
 
     let citasHtml = '';
-    citas.forEach(cita => {
+    citas.forEach((cita, index) => {
       citasHtml += `
-        <div class="border border-gray-200 rounded-lg p-4 mb-4 hover:shadow-md transition-shadow">
+        <div class="border border-gray-200 rounded-lg p-4 mb-4 hover:shadow-md transition-shadow print-cita-item">
           <div class="flex justify-between items-start mb-3">
             <div>
               <h5 class="font-semibold text-lg">Cita #${String(cita.id_cita).padStart(4, '0')}</h5>
-              <p class="text-gray-600">${new Date(cita.fecha).toLocaleDateString()} - ${cita.hora}</p>
+              <p class="text-gray-600">${new Date(cita.fecha).toLocaleDateString('es-ES')} - ${cita.hora}</p>
             </div>
             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusClasses[cita.est_cita] || 'bg-gray-100 text-gray-800'}">
               <span class="mr-1">${statusIcons[cita.est_cita] || '❓'}</span>
@@ -502,14 +502,14 @@
 
     const content = `
       <div class="mb-4">
-        <div class="bg-eps-blue-50 p-4 rounded-lg mb-4">
+        <div class="bg-eps-blue-50 p-4 rounded-lg mb-4 patient-header">
           <h4 class="font-semibold text-eps-blue-800 mb-2">👤 Paciente: ${citas[0].nombre_completo_paciente}</h4>
           <p><strong>Documento:</strong> ${citas[0].dni_pac}</p>
           <p><strong>Total de citas:</strong> ${citas.length}</p>
         </div>
       </div>
       
-      <div class="max-h-96 overflow-y-auto">
+      <div class="max-h-96 overflow-y-auto citas-list">
         ${citasHtml}
       </div>
     `;
@@ -528,37 +528,284 @@
   // Función para imprimir la cita
   function imprimirCita() {
     const modalContent = document.getElementById('citaContent').innerHTML;
+    const isMultipleCitas = modalContent.includes('citas-list');
     const printWindow = window.open('', '_blank');
+    
+    const printStyles = `
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body { 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: #ffffff;
+      }
+      
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 30px;
+        background: white;
+      }
+      
+      .header {
+        text-align: center;
+        margin-bottom: 40px;
+        padding: 30px 0;
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        color: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(30, 64, 175, 0.2);
+      }
+      
+      .header h1 {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+        font-weight: 700;
+      }
+      
+      .header h2 {
+        font-size: 1.4em;
+        margin-bottom: 15px;
+        opacity: 0.9;
+        font-weight: 400;
+      }
+      
+      .header .print-info {
+        font-size: 0.9em;
+        opacity: 0.8;
+        border-top: 1px solid rgba(255,255,255,0.2);
+        padding-top: 15px;
+        margin-top: 15px;
+      }
+      
+      .content {
+        margin-top: 30px;
+      }
+      
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+        margin-bottom: 30px;
+      }
+      
+      .section {
+        background: #f8fafc;
+        padding: 20px;
+        border-radius: 12px;
+        border-left: 4px solid #3b82f6;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+      }
+      
+      .section h4 {
+        color: #1e40af;
+        font-size: 1.1em;
+        margin-bottom: 15px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 8px;
+      }
+      
+      .section p {
+        margin: 8px 0;
+        font-size: 0.95em;
+        line-height: 1.5;
+      }
+      
+      .section p strong {
+        color: #374151;
+        font-weight: 600;
+        display: inline-block;
+        min-width: 80px;
+      }
+      
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.8em;
+        font-weight: 600;
+        margin-left: 10px;
+      }
+      
+      .bg-yellow-100 { background-color: #fef3c7; color: #92400e; }
+      .bg-green-100 { background-color: #dcfce7; color: #166534; }
+      .bg-red-100 { background-color: #fee2e2; color: #991b1b; }
+      .bg-eps-blue-50 { background-color: #eff6ff; color: #1e40af; }
+      
+      .patient-header {
+        background: #eff6ff !important;
+        padding: 20px;
+        border-radius: 12px;
+        border-left: 4px solid #3b82f6;
+        margin-bottom: 25px;
+      }
+      
+      .patient-header h4 {
+        color: #1e40af;
+        font-size: 1.3em;
+        margin-bottom: 10px;
+      }
+      
+      .print-cita-item {
+        background: #fafbfc;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 18px;
+        margin-bottom: 15px;
+        page-break-inside: avoid;
+      }
+      
+      .print-cita-item h5 {
+        color: #1f2937;
+        font-size: 1.1em;
+        margin-bottom: 8px;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 5px;
+      }
+      
+      .citas-list {
+        max-height: none !important;
+        overflow: visible !important;
+      }
+      
+      .footer {
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 2px solid #e5e7eb;
+        text-align: center;
+        color: #6b7280;
+        font-size: 0.9em;
+        page-break-inside: avoid;
+      }
+      
+      .footer .contact-info {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 15px;
+        flex-wrap: wrap;
+      }
+      
+      .footer .contact-item {
+        margin: 5px;
+        padding: 8px 15px;
+        background: #f3f4f6;
+        border-radius: 8px;
+        font-size: 0.85em;
+      }
+      
+      .qr-placeholder {
+        width: 80px;
+        height: 80px;
+        background: #f3f4f6;
+        border: 2px dashed #d1d5db;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8em;
+        color: #6b7280;
+        margin: 20px auto;
+      }
+      
+      @media print {
+        body { margin: 0; padding: 0; }
+        .container { max-width: 100%; margin: 0; padding: 20px; }
+        .header { 
+          background: #1e40af !important; 
+          -webkit-print-color-adjust: exact;
+          color-adjust: exact;
+        }
+        .section { break-inside: avoid; }
+        .print-cita-item { break-inside: avoid; }
+        .footer { page-break-inside: avoid; }
+        .patient-header {
+          background: #eff6ff !important;
+          -webkit-print-color-adjust: exact;
+          color-adjust: exact;
+        }
+      }
+      
+      @page {
+        margin: 1cm;
+        size: A4;
+      }
+    `;
     
     printWindow.document.write(`
       <!DOCTYPE html>
-      <html>
+      <html lang="es">
         <head>
-          <title>Información de Cita - EPS Unillanos</title>
-          <style>
-            body { font-family: Arial, sans-serif; margin: 20px; }
-            .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #1e40af; padding-bottom: 20px; }
-            .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-            .section { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-            .section h4 { margin: 0 0 10px 0; color: #1e40af; }
-            .section p { margin: 5px 0; }
-            @media print { body { margin: 0; } }
-          </style>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>${isMultipleCitas ? 'Historial de Citas' : 'Información de Cita'} - EPS Unillanos</title>
+          <style>${printStyles}</style>
         </head>
         <body>
-          <div class="header">
-            <h1>🏥 EPS Unillanos</h1>
-            <h2>Información de Cita Médica</h2>
-            <p>Fecha de impresión: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}</p>
+          <div class="container">
+            <div class="header">
+              <h1>🏥 EPS Unillanos</h1>
+              <h2>${isMultipleCitas ? 'Historial de Citas Médicas' : 'Comprobante de Cita Médica'}</h2>
+              <div class="print-info">
+                <strong>Fecha de impresión:</strong> ${new Date().toLocaleDateString('es-ES', { 
+                  weekday: 'long', 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })} - ${new Date().toLocaleTimeString('es-ES')}
+              </div>
+            </div>
+            
+            <div class="content">
+              ${modalContent}
+            </div>
+            
+            <div class="footer">
+              <div style="margin-bottom: 15px;">
+                <strong>EPS Unillanos - Sistema de Gestión Médica</strong>
+              </div>
+              <div style="font-size: 0.85em; color: #6b7280; margin-bottom: 15px;">
+                ${isMultipleCitas ? 
+                  'Este documento contiene el historial completo de citas del paciente.' : 
+                  'Este documento es un comprobante oficial de su cita médica. Preséntelo el día de su consulta.'
+                }
+              </div>
+              <div class="contact-info">
+                <div class="contact-item">📞 Tel: (8) 661-8300</div>
+                <div class="contact-item">📧 info@epsunillanos.edu.co</div>
+                <div class="contact-item">🌐 www.epsunillanos.edu.co</div>
+                <div class="contact-item">📍 Villavicencio, Meta</div>
+              </div>
+              <div class="qr-placeholder">
+                QR Code
+              </div>
+              <div style="font-size: 0.8em; color: #9ca3af; margin-top: 10px;">
+                Documento generado automáticamente - No requiere firma
+              </div>
+            </div>
           </div>
-          ${modalContent}
         </body>
       </html>
     `);
     
     printWindow.document.close();
-    printWindow.print();
+    printWindow.focus();
+    
+    // Esperar a que se cargue completamente antes de imprimir
+    setTimeout(() => {
+      printWindow.print();
+    }, 500);
   }
+
 
   // Cerrar modal al hacer clic fuera de él
   document.getElementById('citaModal').addEventListener('click', function(e) {

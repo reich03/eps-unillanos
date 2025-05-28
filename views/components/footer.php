@@ -9,7 +9,7 @@
         </div>
 
         <div class="container mx-auto px-6 py-8 relative z-10">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mx-4">
                 <div class="text-center md:text-left">
                     <div class="flex items-center justify-center md:justify-start space-x-3 mb-4">
                         <div class="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
@@ -24,15 +24,7 @@
                         Brindando servicios de salud de calidad con tecnología moderna y atención personalizada.
                     </p>
                 </div>
-                <div class="text-center">
-                    <h4 class="text-lg font-semibold mb-4 text-white">Enlaces Rápidos</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="/admin" class="text-eps-blue-200 hover:text-white transition-colors duration-200 hover:underline">Dashboard</a></li>
-                        <li><a href="/cita" class="text-eps-blue-200 hover:text-white transition-colors duration-200 hover:underline">Gestión de Citas</a></li>
-                        <li><a href="/medico" class="text-eps-blue-200 hover:text-white transition-colors duration-200 hover:underline">Médicos</a></li>
-                        <li><a href="/servicio" class="text-eps-blue-200 hover:text-white transition-colors duration-200 hover:underline">Servicios</a></li>
-                    </ul>
-                </div>
+                
 
                 <div class="text-center md:text-right">
                     <h4 class="text-lg font-semibold mb-4 text-white">Contacto</h4>
