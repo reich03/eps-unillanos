@@ -52,13 +52,29 @@ class PacienteModel extends Model
         }
     }
 
-    public function delete($id)
+    public function delete($id, &$errorMessage = null)
     {
         try {
+            $check = $this->db->connect()->prepare("
+            SELECT COUNT(*) FROM Cita 
+            WHERE id_pac = :id AND est_cita = 'pendiente'
+        ");
+            $check->execute(['id' => $id]);
+            $count = $check->fetchColumn();
+
+            if ($count > 0) {
+                $errorMessage = "No se puede eliminar el paciente porque tiene citas pendientes";
+                return false;
+            }
+
+            $query = $this->db->connect()->prepare("DELETE FROM Cita WHERE id_pac = :id");
+            $query->execute(['id' => $id]);
+
             $query = $this->db->connect()->prepare("DELETE FROM Paciente WHERE id_pac = :id");
             return $query->execute(['id' => $id]);
         } catch (PDOException $e) {
             error_log("PacienteModel::delete -> " . $e->getMessage());
+            $errorMessage = "Error en la base de datos al eliminar paciente";
             return false;
         }
     }

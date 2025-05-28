@@ -68,10 +68,13 @@ class Paciente extends Controller
     function delete($params)
     {
         $id = $params[0];
-        if ($this->model->delete($id)) {
-            header('Location: /paciente');
+        $error = null;
+
+        if ($this->model->delete($id, $error)) {
+            header('Location: /paciente?success=Paciente eliminado correctamente');
         } else {
-            echo "Error al eliminar paciente";
+            $msg = $error ?? 'Error al eliminar paciente';
+            header('Location: /paciente?error=' . urlencode($msg));
         }
     }
 }

@@ -1,6 +1,17 @@
 <?php require_once 'views/components/header.php'; ?>
 
 <div class="max-w-7xl mx-auto">
+    <?php if (!empty($_GET['error'])): ?>
+        <div class="mb-4 rounded-lg bg-red-100 border border-red-400 text-red-700 px-4 py-3" role="alert">
+            <strong class="font-bold">Error:</strong>
+            <span class="block sm:inline"><?= htmlspecialchars($_GET['error']) ?></span>
+        </div>
+    <?php elseif (!empty($_GET['success'])): ?>
+        <div class="mb-4 rounded-lg bg-green-100 border border-green-400 text-green-700 px-4 py-3" role="alert">
+            <strong class="font-bold">Éxito:</strong>
+            <span class="block sm:inline"><?= htmlspecialchars($_GET['success']) ?></span>
+        </div>
+    <?php endif; ?>
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
             <h2 class="text-3xl font-bold text-gray-900 mb-2">👥 Gestión de Pacientes</h2>

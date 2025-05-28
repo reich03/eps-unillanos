@@ -1,7 +1,9 @@
 <?php
+session_start();
 
 class Admin extends Controller
 {
+
     protected $model;
 
     function __construct()

@@ -37,7 +37,28 @@ class Controller
 
 
 
+    public function loadController(string $controller)
+    {
+        if (!is_string($controller)) {
+            error_log("Error: loadController espera un string. Recibido: " . gettype($controller));
+            return null;
+        }
 
+        $url = 'controllers/' . strtolower($controller) . '.php';
+        if (file_exists($url)) {
+            require_once $url;
+            $controllerName = ucfirst($controller);
+            if (class_exists($controllerName)) {
+                return new $controllerName();
+            } else {
+                error_log("loadController error: Clase $controllerName no encontrada");
+                return null;
+            }
+        } else {
+            error_log("loadController error: No se encontró el archivo $url");
+            return null;
+        }
+    }
 
     function existPost($params)
     {
